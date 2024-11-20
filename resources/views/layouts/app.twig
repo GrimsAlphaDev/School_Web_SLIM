@@ -38,14 +38,14 @@
 
 
 
-   
+
     <!--   Core JS Files   -->
     <script src="{{ base_url }}/dashboard/js/core/popper.min.js"></script>
     <script src="{{ base_url }}/dashboard/js/core/bootstrap.min.js"></script>
     <script src="{{ base_url }}/dashboard/js/plugins/perfect-scrollbar.min.js"></script>
     <script src="{{ base_url }}/dashboard/js/plugins/smooth-scrollbar.min.js"></script>
     <script src="{{ base_url }}/dashboard/js/plugins/chartjs.min.js"></script>
-   
+
     <script>
         var win = navigator.platform.indexOf('Win') > -1;
         if (win && document.querySelector('#sidenav-scrollbar')) {
@@ -55,9 +55,55 @@
             Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
         }
     </script>
-    
+
     <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
     <script src="{{ base_url }}/dashboard/js/argon-dashboard.min.js?v=2.1.0"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    {% if flash.error is defined %}
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Failed',
+            text: '{{ flash . error[0] }}',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+        });
+    </script>
+    {% endif %}
+    {% if flash.info is defined %}
+    <script>
+        Swal.fire({
+            icon: 'info',
+            title: 'Info',
+            text: '{{ flash . info[0] }}',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+        });
+    </script>
+    {% endif %}
+    {% if flash.success is defined %}
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: '{{ flash . success }}',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+        });
+    </script>
+    {% endif %}
     {% block scripts %}{% endblock %}
 </body>
 

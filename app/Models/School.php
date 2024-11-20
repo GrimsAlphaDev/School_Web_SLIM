@@ -21,6 +21,13 @@ class School {
     public function create($data) {
         return $this->db->insert('tbl_schools', $data);
     }
+    // get the last inserted data
+    public function lastInserted() {
+        return $this->db->select('tbl_schools', '*', [
+            'ORDER' => ['id' => 'DESC'],
+            'LIMIT' => 1
+        ]);
+    }
 
     public function update($id, $data) {
         return $this->db->update('tbl_schools', $data, [
@@ -41,4 +48,5 @@ class School {
     public function studentBySchool() {
         return $this->db->query('SELECT tbl_schools.school_name, COUNT(tbl_students.id) as total FROM tbl_schools LEFT JOIN tbl_students ON tbl_schools.id = tbl_students.id_school GROUP BY tbl_schools.id')->fetchAll();
     }
+
 }

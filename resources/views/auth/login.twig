@@ -77,5 +77,18 @@
                 });
             </script>
         {% endif %}
+        {% if flash.success is defined %}
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: '{{ flash.success[0] }}',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            </script>
+        {% endif %}
     </body>
 </html>

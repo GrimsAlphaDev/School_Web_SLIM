@@ -2,12 +2,9 @@
 
 namespace App\Controllers;
 
-use Rakit\Validation\Validator;
 use Slim\Container;
 use Slim\Http\Request;
 use Slim\Http\Response;
-
-$validator = new Validator;
 
 class DashboardController
 {
@@ -25,14 +22,12 @@ class DashboardController
 
     public function index(Request $request, Response $response)
     {
-        // print_r($this->Students->all());
-        // print_r($this->Schools->studentBySchool());
-        // die;
-        if(isset($_SESSION['__flash_messages'])) {
-            $flashMessage = $_SESSION['__flash_messages'];
-            unset($_SESSION['__flash_messages']);
-        }
-
+        $flashMessage = [];
+        if(isset($_SESSION['success'])) {
+            $flashMessage['success'] = $_SESSION['success'] ?? [];
+            unset($_SESSION['success']);
+        } 
+        
         $schoolsStudents = $this->Schools->studentBySchool();
 
         // pisahkan data students dengan data schools

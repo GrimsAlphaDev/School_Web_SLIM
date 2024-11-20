@@ -1,0 +1,291 @@
+{% extends "layouts/app.twig" %}
+
+{% block title %}Home Page{% endblock %}
+
+{% block stylesheets %}
+{# CSS khusus halaman #}
+{% endblock %}
+
+{% block content %}
+
+<div class="row mt-4">
+    <div class="col-lg-12 mb-lg-0 mb-4">
+        <div class="card p-2">
+            <div class="card-header pb-0">
+                <div class="d-flex justify-content-between">
+                    <h6>Daftar Sekolah</h6>
+                    <button class="btn btn-primary" id="tambahSekolahBtn">
+                        <i class="bi bi-plus-circle me-2"></i>Tambah Sekolah
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table id="schoolTable" class="table align-items-center mb-0">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>ID</th>
+                            <th>Nama Sekolah</th>
+                            <th>Alamat</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for school in schools %}
+                        <tr>
+                            <td>{{ loop . index }}</td>
+                            <td>{{ school . id }}</td>
+                            <td>{{ school . school_name }}</td>
+                            <td>{{ school . address }}</td>
+                            <td class="align-middle">
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-warning btn-sm edit-proyek" data-id="{{ school . id }}">
+                                        <i class="bi bi-pen"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm hapus-proyek" data-id="{{ school . id }}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="sekolahModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tambah Data Sekolah</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="sekolahForm">
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="sekolahId">
+                    <div class="form-group mb-3">
+                        <label class="form-label">Nama Sekolah</label>
+                        <input type="text" class="form-control" name="school_name"
+                            placeholder="Masukkan nama sekolah" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Alamat</label>
+                        <textarea class="form-control" name="address" rows="3" placeholder="Masukkan alamat sekolah" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{# JS khusus halaman #}
+<script>
+    $(document).ready(function() {
+
+        const baseUrl = {{ base_url | json_encode | raw }};
+
+        const table = $('#schoolTable').DataTable({
+            responsive: true,
+            language: {
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                paginate: {
+                    first: "Pertama",
+                    last: "Terakhir",
+                    next: "Selanjutnya",
+                    previous: "Sebelumnya"
+                }
+            },
+            pageLength: 10, // Batasi 10 data per halaman
+            lengthMenu: [
+                [10, 25, 50, -1],
+                [10, 25, 50, "Semua"]
+            ],
+            columns: [{
+                    orderable: false
+                },
+                {
+                    orderable: true
+                },
+                {
+                    orderable: true
+                },
+                {
+                    orderable: true
+                },
+                {
+                    orderable: false
+                }
+            ]
+        });
+
+        // Tambah Sekolah
+        $('#tambahSekolahBtn').on('click', function() {
+            $('#sekolahForm')[0].reset(); // Reset form
+            $('#sekolahId').val(''); // Kosongkan ID
+            $('#sekolahModal').modal('show');
+        });
+
+        // Edit Sekolah
+        $(document).on('click', '.edit-sekolah', function() {
+            const id = $(this).data('id');
+
+            // Ambil data sekolah via AJAX
+            $.ajax({
+                url: baseUrl + `/school/get`,
+                method: 'GET',
+                success: function(response) {
+                    console.log(response);
+                    if (response.success) {
+                        // Isi form dengan data sekolah
+                        $('#sekolahId').val(response.sekolah.id);
+                        $('input[name="school_name"]').val(response.sekolah.school_name);
+                        $('textarea[name="address"]').val(response.sekolah.address);
+
+                        $('#sekolahModal').modal('show');
+                    } else {
+                        Swal.fire('Gagal!', response.message, 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Gagal!', 'Terjadi kesalahan saat menghubungi server.',
+                        'error');
+                }
+            });
+        });
+
+        // Submit Form (Tambah)
+        $('#sekolahForm').on('submit', function(e) {
+            e.preventDefault();
+
+            const formData = $(this).serialize();
+            const url = baseUrl + '/school/insert';
+
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: formData,
+                dataType: 'json', // Tambahkan ini
+                success: function(response) {
+                    console.log(response);
+
+                    if (response.success) {
+                        Swal.fire('Berhasil!', response.message, 'success');
+
+                        // Tambahkan pengecekan
+                        if (response.schools) {
+                            addNewTableRow(response.schools);
+                        }
+
+                        $('#sekolahModal').modal('hide');
+
+                    } else {
+                        Swal.fire('Gagal!', response.message, 'error');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // Tambahkan logging error untuk debugging
+                    console.error('Ajax Error:', status, error);
+                    console.log(xhr.responseText);
+
+                    Swal.fire('Gagal!', 'Terjadi kesalahan saat menghubungi server.',
+                        'error');
+                }
+            });
+        });
+
+        // Tambah baris baru
+        function addNewTableRow(school) {
+            // Pastikan school adalah objek valid
+            if (school && school.id) {
+                table.row.add([
+                    table.rows().count() + 1, // Nomor urut
+                    school.id,
+                    school.school_name || '', // Tambahkan fallback
+                    school.address || '', // Tambahkan fallback
+                    `<td class="align-middle">
+                <div class="btn-group" role="group">
+                    <button class="btn btn-warning btn-sm edit-sekolah" data-id="${school.id}">
+                        <i class="bi bi-pen"></i>
+                    </button>
+                    <button class="btn btn-danger btn-sm hapus-sekolah" data-id="${school.id}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </td>`
+                ]).draw(false);
+            }
+        }
+
+        // Update baris yang sudah ada
+        function updateTableRow(school) {
+            const row = table.row(`[data-id="${school.id}"]`);
+            if (row.length) {
+                row.data([
+                    row.index() + 1, // Tetap gunakan nomor urut yang sama
+                    school.id,
+                    school.school_name,
+                    school.address,
+                    `<td class="align-middle">
+                <div class="btn-group" role="group">
+                    <button class="btn btn-warning btn-sm edit-sekolah" data-id="${school.id}">
+                        <i class="bi bi-pen"></i>
+                    </button>
+                    <button class="btn btn-danger btn-sm hapus-sekolah" data-id="${school.id}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </td>`
+                ]).draw(false);
+            }
+        }
+
+        // Hapus Sekolah
+        $(document).on('click', '.hapus-sekolah', function() {
+            const id = $(this).data('id');
+
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Data ini akan dihapus!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, hapus!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `/hapus-sekolah/${id}`,
+                        method: 'DELETE',
+                        success: function(response) {
+                            if (response.success) {
+                                table.ajax.reload(); // Reload DataTable
+                                Swal.fire('Terhapus!', response.message, 'success');
+                            } else {
+                                Swal.fire('Gagal!', response.message, 'error');
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Gagal!',
+                                'Terjadi kesalahan saat menghubungi server.',
+                                'error');
+                        }
+                    });
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
