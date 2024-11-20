@@ -1,13 +1,13 @@
 <?php
 
 use App\Controllers\AuthController;
+use App\Controllers\DashboardController;
 use App\Middleware\FlashMiddleware;
 use App\Middleware\SessionMiddleware;
 use \Slim\App;
 use \Slim\Container;
 use Slim\Views\Twig;
-use Medoo\Medoo;
-use Slim\Views\TwigExtension;
+use App\Middleware\CsrfMiddleware;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -62,25 +62,37 @@ $container['view'] = function ($container) {
 
     $view->getEnvironment()->addGlobal('app', [
         'name' => 'School Web',
-        'url' => $baseUrl,
+        'url' => $baseUrl
     ]);
 
     return $view;
 };
 
 
+
 $container['Admin'] = function ($container) {
     return new \App\Models\Admin($container->database);
 };
+
+$container['School'] = function ($container) {
+    return new \App\Models\School($container->database);
+};
+
+$container['Students'] = function ($container) {
+    return new \App\Models\Students($container->database);
+};
+
 
 // Dependency Injection untuk Controllers
 $container['AuthController'] = function ($container) {
     return new AuthController($container);
 };
 
+$container['DashboardController'] = function ($container) {
+    return new DashboardController($container);
+};
 
 $app = new App($container);
-
 $app->add(new SessionMiddleware());
 $app->add(new FlashMiddleware());
 

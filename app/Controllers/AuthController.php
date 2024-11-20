@@ -36,37 +36,35 @@ class AuthController
     public function postLogin(Request $request, Response $response)
     {
         $validator = new Validator();
-
+        
         $validation = $validator->validate($request->getParams(), [
             'username' => 'required',
             'password' => 'required'
         ]);
-
+        
         if ($validation->fails()) {
             setFlash('error', $validation->errors()->firstOfAll());
             return $response->withRedirect('/login')->withStatus(302);
         }
-
+        
         $username = $request->getParam('username');
         $password = $request->getParam('password');
-
+        
         try {
             $admin = $this->Admin->getByUsername($username);
-
+            
             if ($admin && password_verify($password, $admin['password'])) {
-
+                
                 // Generate JWT Token
                 $token = $this->generateToken($admin);
-
+                
                 // set session
                 $_SESSION['user_id'] = $admin['id'];
                 $_SESSION['token'] = $token;
-
                 // flash message
                 setSession('success', 'Login success');
-
-               
-                return $response->withRedirect('/admin/dashboard')->withStatus(302);
+                
+                return $response->withRedirect('/')->withStatus(302);
             } else {
                 setFlash('error', 'Username or password is wrong');
 
@@ -92,13 +90,6 @@ class AuthController
         return $response->withRedirect('/login')->withStatus(302);
     }
 
-    public function register(Request $request, Response $response)
-    {
-        return $this->view->render($response, 'auth/register.php', [
-            'title' => 'Register'
-        ]);
-    }
-
     public function postRegister(Request $request, Response $response)
     {
         $validator = new Validator();
@@ -110,7 +101,7 @@ class AuthController
         ]);
 
         if ($validation->fails()) {
-            $this->session->set('error', $validation->errors()->firstOfAll());
+            setFlash('error', $validation->errors()->firstOfAll());
             return $response->withRedirect('/register')->withStatus(302);
         }
 
@@ -125,16 +116,14 @@ class AuthController
         try {
             $this->Admin->create($data);
 
-            $this->session->set('success', 'Admin created successfully');
+            setFlash('success', 'Admin created successfully');
             return $response->withRedirect('/login')->withStatus(302);
         } catch (\Throwable $th) {
-            $this->session->set('error', $th->getMessage());
-            return $this->view->render($response, 'auth/register.php', [
-                'title' => 'Register'
-            ]);
+            setFlash('error', $th->getMessage());
+            return $response->withRedirect('/login')->withStatus(302);
         }
 
-        return $response->withRedirect('/register');
+        return $response->withRedirect('/login');
     }
 
     private function generateToken($user)

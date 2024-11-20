@@ -1,0 +1,79 @@
+{% extends "layouts/app.twig" %}
+
+{% block title %}Home Page{% endblock %}
+
+{% block stylesheets %}
+{# CSS khusus halaman #}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xl-6 mb-xl-0 mb-4">
+        <div class="card">
+            <div class="card-body p-3">
+                <div class="row">
+                    <div class="col-8">
+                        <div class="numbers">
+                            <p class="text-sm mb-0 font-weight-bold">Jumlah Total Siswa</p>
+                            <h5 class="font-weight-bolder">
+                                Imagimary Number
+                            </h5>
+                        </div>
+                    </div>
+                    <div class="col-4 text-end">
+                        <div class="icon icon-shape bg-gradient-primary shadow-primary text-center rounded-circle">
+                            <i class="bi bi-people text-lg opacity-10" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6 mb-xl-0 mb-4">
+        <div class="card">
+            <div class="card-body p-3">
+                <div class="row">
+                    <div class="col-8">
+                        <div class="numbers">
+                            <p class="text-sm mb-0 font-weight-bold">Jumlah Total Sekolah</p>
+                            <h5 class="font-weight-bolder">
+                                Imaginary Number
+                            </h5>
+                        </div>
+                    </div>
+                    <div class="col-4 text-end">
+                        <div class="icon icon-shape bg-gradient-danger shadow-danger text-center rounded-circle">
+                            <i class="bi bi-building text-lg opacity-10" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mt-4">
+    <div class="col-lg-12 mb-lg-0 mb-4">
+        <div class="card z-index-2 h-100">
+            <div class="card-header pb-0 pt-3 bg-transparent">
+                <h6 class="text-capitalize">Jumlah Siswa Persekolah</h6>
+                <p class="text-sm mb-0">
+                    <i class="fa fa-arrow-up text-success"></i>
+                </p>
+            </div>
+            <div class="card-body p-3">
+                <div class="chart">
+                    <canvas id="chart-line" class="chart-canvas" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+
+{% endblock %}
+
+{% block scripts %}
+{# JS khusus halaman #}
+<script src="/assets/js/home.js"></script>
+{% endblock %}

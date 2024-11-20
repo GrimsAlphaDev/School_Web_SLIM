@@ -19,7 +19,7 @@ class GuestMiddleware
     {
         // Jika sudah login, redirect ke dashboard
         if (isset($_SESSION['user_id'])) {
-            return $response->withRedirect($this->container->router->pathFor('tester'));
+            return $response->withRedirect($this->container->router->pathFor('home'));
         }
 
         return $next($request, $response);

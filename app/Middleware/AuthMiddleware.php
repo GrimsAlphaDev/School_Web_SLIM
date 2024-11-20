@@ -20,14 +20,15 @@ class AuthMiddleware
     {
         // Cek Session
         if (!isset($_SESSION['user_id'])) {
-            setFlash('error', 'Silahkan login terlebih dahulu');
+            setFlash('info', 'Silahkan Login');
             return $response->withRedirect($this->container->router->pathFor('login'));
         }
 
+        
         // Validasi Token JWT
         try {
             $token = $_SESSION['token'];
-
+            
             // Decode token
             $decoded = JWT::decode(
                 $token, 
@@ -35,11 +36,9 @@ class AuthMiddleware
                 [
                     'algorithms' => ['HS256'],
                     'kid' => $_ENV['JWT_KID'] 
-                ]
-            );
-
-            // Lanjutkan request
-            return $next($request, $response);
+                    ]
+                );
+                
         } catch (\Firebase\JWT\ExpiredException $e) {
             // Token expired
             $_SESSION = [];
