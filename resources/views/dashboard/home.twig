@@ -16,7 +16,7 @@
                         <div class="numbers">
                             <p class="text-sm mb-0 font-weight-bold">Jumlah Total Siswa</p>
                             <h5 class="font-weight-bolder">
-                                Imagimary Number
+                                {{ countStudents }}
                             </h5>
                         </div>
                     </div>
@@ -37,7 +37,7 @@
                         <div class="numbers">
                             <p class="text-sm mb-0 font-weight-bold">Jumlah Total Sekolah</p>
                             <h5 class="font-weight-bolder">
-                                Imaginary Number
+                                {{ countSchools }}
                             </h5>
                         </div>
                     </div>
@@ -75,5 +75,100 @@
 
 {% block scripts %}
 {# JS khusus halaman #}
-<script src="/assets/js/home.js"></script>
+<script>
+    const schools = {{ schools | json_encode | raw }};
+    const students = {{ students | json_encode | raw }};
+    
+
+    var ctx1 = document.getElementById("chart-line").getContext("2d");
+
+    var gradientStroke1 = ctx1.createLinearGradient(0, 230, 0, 50);
+
+    gradientStroke1.addColorStop(1, 'rgba(94, 114, 228, 0.2)');
+    gradientStroke1.addColorStop(0.2, 'rgba(94, 114, 228, 0.0)');
+    gradientStroke1.addColorStop(0, 'rgba(94, 114, 228, 0)');
+    new Chart(ctx1, {
+        type: "bar",
+        data: {
+            labels: schools,
+            datasets: [{
+                label: "Jumlah Siswa",
+                tension: 0.4,
+                borderWidth: 0,
+                pointRadius: 0,
+                borderColor: "#5e72e4",
+                backgroundColor: gradientStroke1,
+                borderWidth: 3,
+                fill: true,
+                data: students,
+                maxBarThickness: 20 // Increase the bar width
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false,
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index',
+            },
+            scales: {
+                y: {
+                beginAtZero: true,
+                border: {
+                    display: true,
+                    color: '#5e72e4', // Warna border
+                    width: 2
+                },
+                grid: {
+                    drawBorder: true,
+                    display: true,
+                    drawOnChartArea: true,
+                    drawTicks: true,
+                    color: 'rgba(0,0,0,0.1)',
+                    borderDash: [5, 5]
+                },
+                ticks: {
+                    display: true,
+                    padding: 10,
+                    color: '#5e72e4',
+                    font: {
+                        size: 11,
+                        family: "Open Sans",
+                        style: 'normal'
+                    },
+                    // Formatting angka
+                    callback: function(value, index, values) {
+                        return value.toLocaleString();
+                    }
+                }
+            },
+                x: {
+                    grid: {
+                        drawBorder: false,
+                        display: false,
+                        drawOnChartArea: false,
+                        drawTicks: false,
+                        borderDash: [5, 5]
+                    },
+                    ticks: {
+                        display: true,
+                        color: '#ccc',
+                        padding: 20,
+                        font: {
+                            size: 11,
+                            family: "Open Sans",
+                            style: 'normal',
+                            lineHeight: 2
+                        },
+                    }
+                },
+            },
+        },
+    });
+</script>
 {% endblock %}

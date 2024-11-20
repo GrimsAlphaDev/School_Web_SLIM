@@ -34,4 +34,10 @@ class Students {
             'id' => $id
         ]);
     }
+
+    public function count() {
+        return $this->db->count('tbl_students');
+    }
+
+    
 }

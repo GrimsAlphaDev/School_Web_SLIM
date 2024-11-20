@@ -13,22 +13,43 @@ class DashboardController
 {
 
     protected $container;
+    protected $Students;
+    protected $Schools;
 
     public function __construct(Container $container)
     {
         $this->container = $container;
+        $this->Students = $container->get('Students');
+        $this->Schools = $container->get('School');
     }
 
     public function index(Request $request, Response $response)
     {
+        // print_r($this->Students->all());
+        // print_r($this->Schools->studentBySchool());
+        // die;
         if(isset($_SESSION['__flash_messages'])) {
             $flashMessage = $_SESSION['__flash_messages'];
             unset($_SESSION['__flash_messages']);
         }
 
+        $schoolsStudents = $this->Schools->studentBySchool();
+
+        // pisahkan data students dengan data schools
+        foreach ($schoolsStudents as $school) {
+            // get all school
+            $schoolOnly[] = $school['school_name'];
+            // get all students
+            $studentOnly[] = $school['total'];
+        }
+
         return $this->container->view->render($response, 'dashboard/home.twig', [
             'title' => 'Dashboard',
-            'flash' => $flashMessage ?? []
+            'flash' => $flashMessage ?? [],
+            'countStudents' => $this->Students->count(),
+            'countSchools' => $this->Schools->count(),
+            'schools' => $schoolOnly,
+            'students' => $studentOnly
         ]);
     }
 }

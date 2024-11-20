@@ -33,4 +33,12 @@ class School {
             'id' => $id
         ]);
     }
+
+    public function count() {
+        return $this->db->count('tbl_schools');
+    }
+
+    public function studentBySchool() {
+        return $this->db->query('SELECT tbl_schools.school_name, COUNT(tbl_students.id) as total FROM tbl_schools LEFT JOIN tbl_students ON tbl_schools.id = tbl_students.id_school GROUP BY tbl_schools.id')->fetchAll();
+    }
 }
