@@ -1,12 +1,23 @@
 {
     "require": {
         "slim/slim": "3.0",
-        "slim/php-view": "^2.2",
+        "slim/php-view": "^3.0",
         "catfan/medoo": "^1.7",
         "monolog/monolog": "^2.0",
         "php-di/php-di": "^6.0",
         "fzaninotto/faker": "^1.9",
-        "vlucas/phpdotenv": "^5.6"
+        "vlucas/phpdotenv": "^5.6",
+        "rakit/validation": "^1.4",
+        "slim/twig-view": "^2.5",
+        "illuminate/session": "^7.30",
+        "illuminate/config": "^7.30",
+        "slim/flash": "^0.4.0",
+        "aura/session": "^4.0",
+        "firebase/php-jwt": "^6.4",
+        "guzzlehttp/guzzle": "^7.9",
+        "twig/twig": "^2.15",
+        "symfony/debug-bundle": "^5.4",
+        "jenssegers/blade": "1.4"
     },
     "autoload": {
         "psr-4": {
@@ -14,7 +25,8 @@
             "Config\\": "config/",
             "Database\\": "database/",
             "App\\Models\\": "app/models/",
-            "App\\Controllers\\": "app/controllers/"
+            "App\\Controllers\\": "app/controllers/",
+            "App\\Middleware\\": "app/middleware/"
         }
     },
     "require-dev": {

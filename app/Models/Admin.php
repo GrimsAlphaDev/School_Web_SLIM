@@ -1,32 +1,48 @@
 <?php
+
 namespace App\Models;
 
-class Admin {
-    private $db;
+use Medoo\Medoo;
 
-    public function __construct($database) {
-        $this->db = $database;
+class Admin
+{
+    protected $database;
+    protected $table = 'tbl_admins';
+
+
+    public function __construct($database)
+    {
+        $this->database = $database;
     }
 
-    public function findByUsername($username) {
-        return $this->db->get('tbl_admins', '*', [
-            'username' => $username
-        ]);
+    // Method dasar CRUD
+    public function getAll($columns = '*', $where = null)
+    {
+        return $this->database->select($this->table, $columns, $where);
     }
 
-    public function create($data) {
-        return $this->db->insert('tbl_admins', $data);
+    public function getById($id, $columns = '*')
+    {
+        return $this->database->get($this->table, $columns, ['id' => $id]);
     }
 
-    public function update($id, $data) {
-        return $this->db->update('tbl_admins', $data, [
-            'id' => $id
-        ]);
+    public function getByUsername($username, $columns = '*')
+    {
+        return $this->database->get($this->table, $columns, ['username' => $username]);
     }
 
-    public function delete($id) {
-        return $this->db->delete('tbl_admins', [
-            'id' => $id
-        ]);
+    public function create(array $data)
+    {
+        return $this->database->insert($this->table, $data);
+    }
+
+    public function update(array $data, $where)
+    {
+        return $this->database->update($this->table, $data, $where);
+    }
+
+    public function delete($where)
+    {
+        return $this->database->delete($this->table, $where);
     }
 }
