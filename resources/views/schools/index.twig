@@ -62,7 +62,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Tambah Data Sekolah</h5>
+                <h5 class="modal-title">Data Sekolah</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="sekolahForm">
@@ -115,7 +115,7 @@
                 [10, 25, 50, "Semua"]
             ],
             columns: [{
-                    orderable: false
+                    orderable: true
                 },
                 {
                     orderable: true
@@ -137,6 +137,7 @@
             $('#sekolahForm')[0].reset(); // Reset form
             $('#sekolahId').val(''); // Kosongkan ID
             $('#sekolahModal').modal('show');
+            // document.getElementById('sekolahModal').style.display = 'block';
         });
 
         // Edit Sekolah
@@ -210,14 +211,12 @@
             });
         });
 
-
-
-
         // Tambah baris baru
         function addNewTableRow(school) {
             // Pastikan school adalah objek valid
             if (school && school.id) {
-                table.row.add([
+                table.row.add(
+                [
                     table.rows().count() + 1, // Nomor urut
                     school.id,
                     school.school_name || '', // Tambahkan fallback
@@ -232,7 +231,8 @@
                     </button>
                 </div>
             </td>`
-                ]).draw(false);
+                ]).node().setAttribute('data-id', school.id); // Tambahkan data-id di row
+                table.draw(false);
             }
         }
 

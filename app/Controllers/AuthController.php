@@ -134,7 +134,7 @@ class AuthController
             'username' => $user['username'],
             'name' => $user['name'],
             'iat' => time(),
-            'exp' => time() + 3600 // Token berlaku 1 jam
+            'exp' => time() + 43200 // Token berlaku 12 jam
         ];
 
         return JWT::encode($payload, $key, 'HS256',null, [

@@ -24,6 +24,19 @@ $app->post('/school/update/{id}', 'SchoolController:updateSchool')->setName('sch
 // delete school
 $app->delete('/school/delete/{id}', 'SchoolController:deleteSchool')->setName('school.delete')->add(new AuthMiddleware($container));
 
+// student
+$app->get('/student', 'StudentController:index')->setName('student')->add(new AuthMiddleware($container));
+// get student data only
+$app->get('/student/get', 'StudentController:getStudent')->setName('student.get')->add(new AuthMiddleware($container));
+// insert student
+$app->post('/student/insert', 'StudentController:insertStudent')->setName('student.insert')->add(new AuthMiddleware($container));
+// get student by id
+$app->get('/student/get/{id}', 'StudentController:getStudentById')->setName('student.get.id')->add(new AuthMiddleware($container));
+// update student
+$app->post('/student/update/{id}', 'StudentController:updateStudent')->setName('student.update')->add(new AuthMiddleware($container));
+// delete student
+$app->delete('/student/delete/{id}', 'StudentController:deleteStudent')->setName('student.delete')->add(new AuthMiddleware($container));
+
 $app->get('/test', function ($request, $response) {
     return 'test aja';
 })->add(new AuthMiddleware($container))->setName('tester');

@@ -55,7 +55,9 @@ class SchoolController
         // Insert data
         if ($this->Schools->create([
             'school_name' => $request->getParam('school_name'),
-            'address' => $request->getParam('address')
+            'address' => $request->getParam('address'),
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
         ])) {
             // Ambil data terakhir yang diinsert
             $lastInsertedData = $this->Schools->lastInserted();
@@ -93,7 +95,7 @@ class SchoolController
             $response = [
                 'status' => 200,
                 'success' => true,
-                'message' => 'Sekolah berhasil ditambahkan',
+                'message' => 'Sekolah berhasil ditemukan',
                 'school' => $school
             ];
 
@@ -133,7 +135,8 @@ class SchoolController
         // Update data
         if ($this->Schools->update($id, [
             'school_name' => $request->getParam('school_name'),
-            'address' => $request->getParam('address')
+            'address' => $request->getParam('address'),
+            'updated_at' => date('Y-m-d H:i:s')
         ])) {
             // Ambil data terakhir yang diinsert
             $lastInsertedData = $this->Schools->findById($id);
