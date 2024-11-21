@@ -32,17 +32,18 @@
                     </thead>
                     <tbody>
                         {% for school in schools %}
-                        <tr>
+                        <tr data-id="{{ school . id }}">
                             <td>{{ loop . index }}</td>
                             <td>{{ school . id }}</td>
                             <td>{{ school . school_name }}</td>
                             <td>{{ school . address }}</td>
                             <td class="align-middle">
                                 <div class="btn-group" role="group">
-                                    <button class="btn btn-warning btn-sm edit-proyek" data-id="{{ school . id }}">
+                                    <button class="btn btn-warning btn-sm edit-sekolah" data-id="{{ school . id }}"
+                                        id="editSchool{{ school . id }}">
                                         <i class="bi bi-pen"></i>
                                     </button>
-                                    <button class="btn btn-danger btn-sm hapus-proyek" data-id="{{ school . id }}">
+                                    <button class="btn btn-danger btn-sm hapus-sekolah" data-id="{{ school.id }}">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
@@ -144,15 +145,14 @@
 
             // Ambil data sekolah via AJAX
             $.ajax({
-                url: baseUrl + `/school/get`,
+                url: baseUrl + `/school/get/${id}`,
                 method: 'GET',
+                dataType: 'json',
                 success: function(response) {
-                    console.log(response);
                     if (response.success) {
-                        // Isi form dengan data sekolah
-                        $('#sekolahId').val(response.sekolah.id);
-                        $('input[name="school_name"]').val(response.sekolah.school_name);
-                        $('textarea[name="address"]').val(response.sekolah.address);
+                        $('#sekolahId').val(response.school.id);
+                        $('input[name="school_name"]').val(response.school.school_name);
+                        $('textarea[name="address"]').val(response.school.address);
 
                         $('#sekolahModal').modal('show');
                     } else {
@@ -166,27 +166,35 @@
             });
         });
 
-        // Submit Form (Tambah)
         $('#sekolahForm').on('submit', function(e) {
             e.preventDefault();
 
             const formData = $(this).serialize();
-            const url = baseUrl + '/school/insert';
+            const schoolId = $('#sekolahId').val(); // Get the school ID
+
+            let url;
+            if (schoolId) {
+                // If schoolId is present, we are editing
+                url = baseUrl + '/school/update/' + schoolId;
+            } else {
+                // If schoolId is not present, we are adding
+                url = baseUrl + '/school/insert';
+            }
 
             $.ajax({
                 url: url,
                 method: 'POST',
                 data: formData,
-                dataType: 'json', // Tambahkan ini
+                dataType: 'json',
                 success: function(response) {
-                    console.log(response);
-
                     if (response.success) {
                         Swal.fire('Berhasil!', response.message, 'success');
 
-                        // Tambahkan pengecekan
-                        if (response.schools) {
-                            addNewTableRow(response.schools);
+                        // Check if we are editing or adding
+                        if (response.school) {
+                            addNewTableRow(response.school); // For adding
+                        } else if (response.schools) {
+                            updateTableRow(response.schools); // For editing
                         }
 
                         $('#sekolahModal').modal('hide');
@@ -195,16 +203,15 @@
                         Swal.fire('Gagal!', response.message, 'error');
                     }
                 },
-                error: function(xhr, status, error) {
-                    // Tambahkan logging error untuk debugging
-                    console.error('Ajax Error:', status, error);
-                    console.log(xhr.responseText);
-
+                error: function() {
                     Swal.fire('Gagal!', 'Terjadi kesalahan saat menghubungi server.',
                         'error');
                 }
             });
         });
+
+
+
 
         // Tambah baris baru
         function addNewTableRow(school) {
@@ -231,10 +238,11 @@
 
         // Update baris yang sudah ada
         function updateTableRow(school) {
-            const row = table.row(`[data-id="${school.id}"]`);
+            const row = table.row(`[data-id="${school.id}"]`); // Find the row by data-id
             if (row.length) {
+                // Update the row data
                 row.data([
-                    row.index() + 1, // Tetap gunakan nomor urut yang sama
+                    row.index() + 1, // Keep the same index
                     school.id,
                     school.school_name,
                     school.address,
@@ -248,7 +256,9 @@
                     </button>
                 </div>
             </td>`
-                ]).draw(false);
+                ]).draw(false); // Redraw the table without resetting the paging
+            } else {
+                console.error('Row not found for ID:', school.id);
             }
         }
 
@@ -267,11 +277,14 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: `/hapus-sekolah/${id}`,
+                        url: `school/delete/${id}`, // Ensure this URL is correct
                         method: 'DELETE',
+                        dataType: 'json',
                         success: function(response) {
                             if (response.success) {
-                                table.ajax.reload(); // Reload DataTable
+                                // Remove the row from the DataTable
+                                table.row(`[data-id="${id}"]`).remove().draw(
+                                false); 
                                 Swal.fire('Terhapus!', response.message, 'success');
                             } else {
                                 Swal.fire('Gagal!', response.message, 'error');
