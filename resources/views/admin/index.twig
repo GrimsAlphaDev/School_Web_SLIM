@@ -1,0 +1,291 @@
+{% extends "layouts/app.twig" %}
+
+{% block title %}Home Page{% endblock %}
+
+{% block stylesheets %}
+{# CSS khusus halaman #}
+{% endblock %}
+
+{% block content %}
+
+<div class="row mt-4">
+    <div class="col-lg-12 mb-lg-0 mb-4">
+        <div class="card p-2">
+            <div class="card-header pb-0">
+                <div class="d-flex justify-content-between">
+                    <h6>Daftar Admin</h6>
+                    <button class="btn btn-primary" id="tambahAdminBtn">
+                        <i class="bi bi-plus-circle me-2"></i>Tambah Admin
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table id="adminTable" class="table align-items-center mb-0">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Username</th>
+                            <th>Nama</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for admin in admins %}
+                        <tr data-id="{{ admin . id }}">
+                            <td>{{ loop . index }}</td>
+                            <td>{{ admin . username }}</td>
+                            <td>{{ admin . name }}</td>
+                            <td class="align-middle">
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-warning btn-sm edit-admin" data-id="{{ admin . id }}">
+                                        <i class="bi bi-pen"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm hapus-admin" data-id="{{ admin . id }}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="adminModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Data Admin</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="adminForm">
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="adminId">
+                    <div class="form-group mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" name="username" id="username" class="form-control" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="name" class="form-label">Nama</label>
+                        <input type="text" name="name" id="name" class="form-control" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" name="password" id="password" class="form-control" required>
+                        <small class="form-text text-muted" id="notesPass"></small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{# JS khusus halaman #}
+<script>
+    $(document).ready(function() {
+        const baseUrl = {{ base_url | json_encode | raw }};
+
+        const table = $('#adminTable').DataTable({
+            responsive: true,
+            language: {
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                paginate: {
+                    first: "Pertama",
+                    last: "Terakhir",
+                    next: "Selanjutnya",
+                    previous: "Sebelumnya"
+                }
+            },
+            pageLength: 10,
+            lengthMenu: [
+                [10, 25, 50, -1],
+                [10, 25, 50, "Semua"]
+            ],
+            columns: [{
+                    orderable: true
+                },
+                {
+                    orderable: true
+                },
+                {
+                    orderable: true
+                },
+                {
+                    orderable: false
+                }
+            ],
+        });
+
+        // Tambah Admin
+        $('#tambahAdminBtn').on('click', function() {
+            $('#adminModal').modal('show');
+            $('#adminForm')[0].reset(); // Reset form
+            $('#adminId').val(''); // Kosongkan ID
+            $('#notesPass').html('');
+        });
+
+        // Edit Admin
+        $(document).on('click', '.edit-admin', function() {
+            const id = $(this).data('id');
+
+            // Ambil data admin via AJAX
+            $.ajax({
+                url: `${baseUrl}/admin/get/${id}`,
+                method: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        $('#adminId').val(response.admin.id);
+                        $('#username').val(response.admin.username);
+                        $('#name').val(response.admin.name);
+                        // remove required attribute for password field
+                        $('#password').val('');
+                        $('#password').removeAttr('required');
+                        $('#notesPass').html('Kosongkan jika tidak ingin mengubah password');
+                        $('#adminModal').modal('show');
+                    } else {
+                        Swal.fire('Gagal!', response.message, 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Gagal!', 'Terjadi kesalahan saat menghubungi server.',
+                        'error');
+                }
+            });
+        });
+
+        // Handle form submission for adding/editing admins
+        $('#adminForm').on('submit', function(e) {
+            e.preventDefault();
+
+            const formData = $(this).serialize();
+            const adminId = $('#adminId').val(); // Get the admin ID
+
+            let url;
+            if (adminId) {
+                // If adminId is present, we are editing
+                url = `${baseUrl}/admin/update/${adminId}`;
+            } else {
+                // If adminId is not present, we are adding
+                url = `${baseUrl}/admin/insert`;
+            }
+
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: formData,
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire('Berhasil!', response.message, 'success');
+                        if (response.admin) {
+                            if (response.message == "Data admin berhasil diupdate") {
+                                updateTableRow(response.admin); // For editing
+                            } else {
+                                addNewTableRow(response.admin); // For adding
+                            }
+                        }
+                        $('#adminModal').modal('hide');
+                    } else {
+                        Swal.fire('Gagal!', response.message, 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Gagal!', 'Terjadi kesalahan saat menghubungi server.',
+                        'error');
+                }
+            });
+        });
+
+        // Tambah baris baru
+        function addNewTableRow(admin) {
+            if (admin && admin.id) {
+                table.row.add([
+                    table.rows().count() + 1, // Nomor urut
+                    admin.username,
+                    admin.name,
+                    `<div class="btn-group" role="group">
+                        <button class="btn btn-warning btn-sm edit-admin" data-id="${admin.id}">
+                            <i class="bi bi-pen"></i>
+                        </button>
+                        <button class="btn btn-danger btn-sm hapus-admin" data-id="${admin.id}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>`
+                ]).node().setAttribute('data-id', admin.id);
+                table.draw(false);
+            }
+        }
+
+        // Update baris yang sudah ada
+        function updateTableRow(admin) {
+            const row = table.row(`[data-id="${admin.id}"]`); // Find the row by data-id
+            if (row.length) {
+                row.data([
+                    row.index() + 1, // Keep the same index
+                    admin.username,
+                    admin.name,
+                    `<div class="btn-group" role="group">
+                        <button class="btn btn-warning btn-sm edit-admin" data-id="${admin.id}">
+                            <i class="bi bi-pen"></i>
+                        </button>
+                        <button class="btn btn-danger btn-sm hapus-admin" data-id="${admin.id}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>`
+                ]).draw(false); // Redraw the table without resetting the paging
+            } else {
+                console.error('Row not found for ID:', admin.id);
+            }
+        }
+
+        // Hapus Admin
+        $(document).on('click', '.hapus-admin', function() {
+            const id = $(this).data('id');
+
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Data ini akan dihapus!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, hapus!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `${baseUrl}/admin/delete/${id}`, // Ensure this URL is correct
+                        method: 'DELETE',
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response.success) {
+                                table.row(`[data-id="${id}"]`).remove().draw(
+                                false); // Remove the row from the DataTable
+                                Swal.fire('Terhapus!', response.message, 'success');
+                            } else {
+                                Swal.fire('Gagal!', response.message, 'error');
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Gagal!',
+                                'Terjadi kesalahan saat menghubungi server.',
+                                'error');
+                        }
+                    });
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

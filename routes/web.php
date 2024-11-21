@@ -37,6 +37,15 @@ $app->post('/student/update/{id}', 'StudentController:updateStudent')->setName('
 // delete student
 $app->delete('/student/delete/{id}', 'StudentController:deleteStudent')->setName('student.delete')->add(new AuthMiddleware($container));
 
-$app->get('/test', function ($request, $response) {
-    return 'test aja';
-})->add(new AuthMiddleware($container))->setName('tester');
+// admin
+$app->get('/admin', 'AdminController:index')->setName('admin')->add(new AuthMiddleware($container));
+// get admin data only
+$app->get('/admin/get', 'AdminController:getAdmin')->setName('admin.get')->add(new AuthMiddleware($container));
+// insert admin
+$app->post('/admin/insert', 'AdminController:insertAdmin')->setName('admin.insert')->add(new AuthMiddleware($container));
+// get admin by id
+$app->get('/admin/get/{id}', 'AdminController:getAdminById')->setName('admin.get.id')->add(new AuthMiddleware($container));
+// update admin
+$app->post('/admin/update/{id}', 'AdminController:updateAdmin')->setName('admin.update')->add(new AuthMiddleware($container));
+// delete admin
+$app->delete('/admin/delete/{id}', 'AdminController:deleteAdmin')->setName('admin.delete')->add(new AuthMiddleware($container));

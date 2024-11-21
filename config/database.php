@@ -20,6 +20,7 @@ try {
         ]
     ]);
 
+
 } catch (\Exception $e) {
     // Tampilkan detail error untuk debugging
     die("Koneksi database gagal: " . $e->getMessage());

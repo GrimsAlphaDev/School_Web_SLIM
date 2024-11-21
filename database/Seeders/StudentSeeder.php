@@ -13,7 +13,7 @@ class StudentSeeder extends AbstractSeed
         // Ambil ID sekolah yang baru saja diinsert
         $schoolIds = array_column($this->fetchAll('SELECT id FROM tbl_schools'), 'id');
         
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 1500; $i++) {
             $studentData[] = [
                 'id_school' => $faker->randomElement($schoolIds),
                 'name' => $faker->name,

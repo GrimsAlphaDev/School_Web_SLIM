@@ -13,9 +13,11 @@ class SchoolSeeder extends AbstractSeed
         $schools = $this->table('tbl_schools');
         $schoolData = [];
 
-        for ($i = 0; $i < 5; $i++) {
+        $prefix = ['SD', 'SMP', 'SMA', 'SMK'];
+
+        for ($i = 0; $i < 1005; $i++) {
             $schoolData[] = [
-                'school_name' => $faker->company,
+                'school_name' => $prefix[rand(0, 3)] . ' ' . $faker->name,
                 'address' => $faker->address,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s')

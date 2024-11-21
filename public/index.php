@@ -4,6 +4,7 @@ use App\Controllers\AuthController;
 use App\Controllers\DashboardController;
 use App\Controllers\SchoolController;
 use App\Controllers\StudentController;
+use App\Controllers\AdminController;
 use App\Middleware\FlashMiddleware;
 use App\Middleware\SessionMiddleware;
 use \Slim\App;
@@ -100,6 +101,10 @@ $container['SchoolController'] = function ($container) {
 
 $container['StudentController'] = function ($container) {
     return new StudentController($container);
+};
+
+$container['AdminController'] = function ($container) {
+    return new AdminController($container);
 };
 
 $app = new App($container);

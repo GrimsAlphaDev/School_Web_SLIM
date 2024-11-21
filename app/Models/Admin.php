@@ -36,13 +36,21 @@ class Admin
         return $this->database->insert($this->table, $data);
     }
 
-    public function update(array $data, $where)
+    public function lastInserted($columns = '*')
     {
-        return $this->database->update($this->table, $data, $where);
+        return $this->database->select($this->table, $columns, [
+            'ORDER' => ['id' => 'DESC'],
+            'LIMIT' => 1
+        ]);
     }
 
-    public function delete($where)
+    public function update($id, $data)
     {
-        return $this->database->delete($this->table, $where);
+        return $this->database->update($this->table, $data, ['id' => $id]);
+    }
+
+    public function delete($id)
+    {
+        return $this->database->delete($this->table, ['id' => $id]);
     }
 }
